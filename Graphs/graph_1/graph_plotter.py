@@ -7,6 +7,101 @@ import pandas as pd
 file_path = r"C:\Users\pnish\Desktop\graph data.xlsx"
 df = pd.read_excel(file_path)
 
+
+
+
+
+
+# graph_router.py
+
+from graph_plotter import (
+    plot_erf_with_dropdown,
+    plot_psafe_with_dropdown,
+    plot_depth_with_dropdown,
+    plot_orientation_with_dropdown
+)
+
+import os
+
+def plot_erf(df, view):
+    min_oddo = int(df['Abs. Distance (m)'].min()) // 500 * 500
+    max_oddo = int(df['Abs. Distance (m)'].max()) + 500
+    tick_vals = list(range(min_oddo, max_oddo, 500))
+
+    df.columns = df.columns.str.strip()
+    df_erf = df.groupby(['Abs. Distance (m)', 'Surface Location'], as_index=False).agg({
+        'ERF (ASME B31G)': 'max'
+    })
+    df_erf.sort_values(by='Abs. Distance (m)', inplace=True)
+
+    internal_df = df_erf[df_erf['Surface Location'] == 'Internal'].copy()
+    external_df = df_erf[df_erf['Surface Location'] == 'External'].copy()
+
+    filename = os.path.abspath('erf_ui_graph.html')
+    plot_erf_with_dropdown(internal_df, external_df, min_oddo, max_oddo, tick_vals, filename)
+    return filename
+
+def plot_psafe(df, view):
+    min_oddo = int(df['Abs. Distance (m)'].min()) // 500 * 500
+    max_oddo = int(df['Abs. Distance (m)'].max()) + 500
+    tick_vals = list(range(min_oddo, max_oddo, 500))
+
+    df.columns = df.columns.str.strip()
+    df.rename(columns={'Psafe (ASME B31G), kg/cm2': 'Psafe (ASME B31G)'}, inplace=True)
+    df_grouped = df.groupby(['Abs. Distance (m)', 'Surface Location'], as_index=False).agg({
+        'Psafe (ASME B31G)': 'max'
+    })
+    df_grouped.sort_values(by='Abs. Distance (m)', inplace=True)
+
+    internal_df = df_grouped[df_grouped['Surface Location'] == 'Internal'].copy()
+    external_df = df_grouped[df_grouped['Surface Location'] == 'External'].copy()
+
+    filename = os.path.abspath('psafe_ui_graph.html')
+    plot_psafe_with_dropdown(internal_df, external_df, min_oddo, max_oddo, tick_vals, filename)
+    return filename
+
+def plot_depth(df, view):
+    min_oddo = int(df['Abs. Distance (m)'].min()) // 500 * 500
+    max_oddo = int(df['Abs. Distance (m)'].max()) + 500
+    tick_vals = list(range(min_oddo, max_oddo, 500))
+
+    df.columns = df.columns.str.strip()
+    df.rename(columns={'Depth, % WT': 'Depth % WT'}, inplace=True)
+    df_grouped = df.groupby(['Abs. Distance (m)', 'Surface Location'], as_index=False).agg({
+        'Depth % WT': 'max'
+    })
+    df_grouped.sort_values(by='Abs. Distance (m)', inplace=True)
+
+    internal_df = df_grouped[df_grouped['Surface Location'] == 'Internal'].copy()
+    external_df = df_grouped[df_grouped['Surface Location'] == 'External'].copy()
+
+    filename = os.path.abspath('depth_ui_graph.html')
+    plot_depth_with_dropdown(internal_df, external_df, min_oddo, max_oddo, tick_vals, filename)
+    return filename
+
+def plot_orientation(df, view):
+    df["Angle (deg)"] = df["Orientation O'clock"].apply(clock_to_degrees)
+    df.dropna(subset=["Angle (deg)", "Abs. Distance (m)", "Surface Location"], inplace=True)
+
+    internal_df = df[df["Surface Location"] == "Internal"]
+    external_df = df[df["Surface Location"] == "External"]
+
+    min_dist = df["Abs. Distance (m)"].min()
+    max_dist = df["Abs. Distance (m)"].max()
+
+    filename = os.path.abspath('orientation_ui_graph.html')
+    plot_orientation_with_dropdown(internal_df, external_df, min_dist, max_dist, filename)
+    return filename
+
+def clock_to_degrees(clock_str):
+    try:
+        h, m, s = map(int, str(clock_str).split(":"))
+        return (h + m / 60 + s / 3600) % 12 * 30
+    except:
+        return None
+
+
+
 #---------------------- ERF vs Absolute Distance Graph (internal ,external and combined )---------------------
 
 # def plot_real_oddo(df_plot, tick_vals, min_oddo, max_oddo, y_column, title, color, filename):
