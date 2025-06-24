@@ -109,7 +109,6 @@ def plot_metal_loss(df, feature_type=None, dimension_class=None, return_fig=Fals
         return html_path
 
 
-#------------------------    end        --------------------------------------
 
 #-----------------------    temperature graph------------------------------------
 
@@ -120,10 +119,10 @@ def plot_metal_loss(df, feature_type=None, dimension_class=None, return_fig=Fals
 #     print(f"[DEBUG] Dataframe columns: {df.columns.tolist()}")
 
 #     # if 'Temperature (°C)' not in df.columns:
-#     #     # If temperature column does not exist, create random data (you can remove this part if temperature already exists)
-#     #     print("[INFO] Temperature column not found. Creating random temperature data.")
-#     #     np.random.seed(0)  # For reproducibility
-#     #     df['Temperature (°C)'] = np.random.uniform(low=20, high=80, size=len(df))
+        # # If temperature column does not exist, create random data (you can remove this part if temperature already exists)
+        # print("[INFO] Temperature column not found. Creating random temperature data.")
+        # np.random.seed(0)  # For reproducibility
+        # df['Temperature (°C)'] = np.random.uniform(low=20, high=80, size=len(df))
 
 #     df.sort_values(by='Abs. Distance (m)', inplace=True)
 
@@ -158,6 +157,31 @@ def plot_temperature(df, return_fig=False):
     df.columns = df.columns.str.strip()
     df.sort_values(by='Abs. Distance (m)', inplace=True)
 
+    if 'Temperature (°C)' not in df.columns:
+        # # If temperature column does not exist, create random data (you can remove this part if temperature already exists)
+        # print("[INFO] Temperature column not found. Creating random temperature data.")
+        # np.random.seed(0)  # For reproducibility
+        # df['Temperature (°C)'] = np.random.uniform(low=50, high=55, size=len(df))
+        # Sort the dataframe by distance
+        temperature_profile = np.linspace(55, 50, len(df))
+
+        # Add small random noise within ±0.05°C to make it look natural
+        noise = np.random.uniform(low=-0.5, high=0.5, size=len(df))
+        
+        # Final temperature data
+        df['Temperature (°C)'] = temperature_profile + noise
+       
+        # Generate a linear temperature sequence with step of 0.1
+        # num_points = len(df)
+        # temperature_sequence = np.arange(55, 55 - 0.1 * num_points, -0.1)
+        
+        # # If the sequence is longer than data points, trim it
+        # if len(temperature_sequence) > num_points:
+        #     temperature_sequence = temperature_sequence[:num_points]
+        
+        # df['Temperature (°C)'] = temperature_sequence
+
+
     # Calculate dynamic y-axis range
     # y_min = df['Temperature (°C)'].min() - 5
     # y_max = df['Temperature (°C)'].max() + 5
@@ -178,7 +202,7 @@ def plot_temperature(df, return_fig=False):
             title='Temperature (°C)',
             gridcolor='lightgray',
             range=[0, 100],  
-            dtick=20         
+            dtick=10        
         ),
         height=700,
         width=1600,
@@ -193,9 +217,8 @@ def plot_temperature(df, return_fig=False):
     else:
         return html_path
 
-#------------------------    end        --------------------------------------
 
-# ------------------    sensor graph       -----------------------------------
+# -----------------------     sensor graph       -----------------------------------
 
 def plot_sensor_percentage(df, return_fig=False):
     df.columns = df.columns.str.strip()
@@ -244,9 +267,8 @@ def plot_sensor_percentage(df, return_fig=False):
         return html_path
 
 
-#------------------------    end        --------------------------------------
 
-#------------------------    ERF Graph        --------------------------------------
+#------------------------     ERF Graph        --------------------------------------
 def plot_erf(df, view="Both",return_fig=False):
     df = df[df['Surface Location'].isin(['Internal', 'External'])].copy()
     df['Abs. Distance (m)'] = df['Abs. Distance (m)'].round(1)
@@ -295,7 +317,7 @@ def plot_erf(df, view="Both",return_fig=False):
     return fig, html_path
 
 
-#------------------------    PSAFE Graph        --------------------------------------
+#------------------------     PSAFE Graph        --------------------------------------
 def plot_psafe(df, view="Both",return_fig=False):
     df.columns = df.columns.str.strip()
     df.rename(columns={col: "Psafe (ASME B31G)" for col in df.columns if "Psafe" in col}, inplace=True)
@@ -347,7 +369,7 @@ def plot_psafe(df, view="Both",return_fig=False):
 
 
 
-#------------------------    Orientation Graph        --------------------------------------
+#-------------------------    Orientation Graph        --------------------------------------
 def clock_to_degrees(clock_str):
     try:
         h, m, s = map(int, str(clock_str).split(":"))

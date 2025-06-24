@@ -114,7 +114,18 @@ class GraphApp(QWidget):
 
         self.setLayout(self.layout)
 
+    def reset_selections(self):
+       self.feature_identification.setCurrentIndex(0)
+       self.dimension_classification.setCurrentIndex(0)
+       self.view_type.setCurrentIndex(0)
+       self.browser.setHtml("")  # Clear the graph
+       self.save_btn.setVisible(False)  # Hide Save button
+
+
     def on_graph_type_changed(self, text):
+        # Reset everything when graph type changes
+        self.reset_selections()
+        
         if text == "Defects":
             self.feature_identification_label.setVisible(True)
             self.feature_identification.setVisible(True)
