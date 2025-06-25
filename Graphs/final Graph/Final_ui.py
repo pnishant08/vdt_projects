@@ -41,7 +41,7 @@ class GraphApp(QWidget):
         self.file_label = QLabel("No file selected")
         self.layout.addWidget(self.file_label)
 
-        self.load_btn = QPushButton("Load Excel File")
+        self.load_btn = QPushButton("Load Pipe Tally")
         self.load_btn.clicked.connect(self.load_file)
         self.layout.addWidget(self.load_btn)
 
@@ -125,7 +125,7 @@ class GraphApp(QWidget):
     def on_graph_type_changed(self, text):
         # Reset everything when graph type changes
         self.reset_selections()
-        
+
         if text == "Defects":
             self.feature_identification_label.setVisible(True)
             self.feature_identification.setVisible(True)
